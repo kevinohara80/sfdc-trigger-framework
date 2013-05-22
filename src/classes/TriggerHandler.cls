@@ -1,18 +1,10 @@
 public virtual class TriggerHandler {
-
-  private TriggerHandlerSettings__c settings;
 	
   public TriggerHandler() {
-    this.settings = TriggerHandlerSettings__c.getOrgDefaults();
+
   }
 
   public void run() {
-
-    // bail out of the handler if triggers are disabled or this is running
-    // outside of the Trigger context
-    if(this.settings.Disable_All_Triggers__c) {
-      return;
-    }
 
     // throw an exception if the trigger handler is called when a trigger 
     // is not executing
