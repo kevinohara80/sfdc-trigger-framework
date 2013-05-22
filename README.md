@@ -10,15 +10,13 @@ This trigger framework bundles a single **TriggerHandler** base class that you c
 
 ## Usage
 
-To use a trigger handler, you only need to construct an instance of your trigger handler and call the `run()` method. Here is an example of an Opportunity trigger.
+To create a trigger handler, you simply need to create a class that inherits from **TriggerHandler.cls**. Here is an example for creating an Opportunity trigger handler.
 
 ```java
-trigger OpportunityTrigger on Opportunity (before insert, before update) {
-  new OpportunityTriggerHandler().run();
-}
+public class OpportunityTriggerHandler extends TriggerHandler {
 ```
 
-In your trigger handler, to add logic to any of these contexts you only need to override them in your trigger handler. Here is how we would add logic to a `beforeUpdate` trigger.
+In your trigger handler, to add logic to any of the trigger contexts, you only need to override them in your trigger handler. Here is how we would add logic to a `beforeUpdate` trigger.
 
 ```java
 public class OpportunityTriggerHandler extends TriggerHandler {
@@ -31,6 +29,14 @@ public class OpportunityTriggerHandler extends TriggerHandler {
 
   // add overrides for other contexts
 
+}
+```
+
+To use the trigger handler, you only need to construct an instance of your trigger handler within the trigger handler itself and call the `run()` method. Here is an example of the Opportunity trigger.
+
+```java
+trigger OpportunityTrigger on Opportunity (before insert, before update) {
+  new OpportunityTriggerHandler().run();
 }
 ```
 
