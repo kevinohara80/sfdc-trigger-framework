@@ -32,6 +32,25 @@ public class OpportunityTriggerHandler extends TriggerHandler {
 }
 ```
 
+**Note:** When referencing the Trigger statics within a class, SObjects are returned versus SObject subclasses like Opportunity, Account, etc. This means that you must cast when you reference them in your trigger handler. You could do this in your constructor if you wanted. Just remember to call super() at the end to run the parent's constructor. Right now, there is no logic in the parent's constructor but there could be one day.
+
+```java
+public class OpportunityTriggerHandler extends TriggerHandler {
+
+  private Map<Id, Opportunity> newOppMap;
+
+  public OpportunityTriggerHandler() {
+    this.newOppMap = (Map<Id, Opportunity>) Trigger.newMap;
+    super();
+  }
+  
+  public override void afterUpdate() {
+    //
+  }
+
+}
+```
+
 To use the trigger handler, you only need to construct an instance of your trigger handler within the trigger handler itself and call the `run()` method. Here is an example of the Opportunity trigger.
 
 ```java
