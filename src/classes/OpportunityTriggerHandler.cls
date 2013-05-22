@@ -1,5 +1,9 @@
 public class OpportunityTriggerHandler extends TriggerHandler {
 
+  public OpportunityTriggerHandler() {
+    this.setMaxLoopCount(5);
+  }
+
   /****************************************
    * context method overrides
    ****************************************/
@@ -8,8 +12,9 @@ public class OpportunityTriggerHandler extends TriggerHandler {
     runValidations();
   } 
 
-  protected override void afterInsert() {
-    //
+  protected override void afterUpdate() {
+    List<Opportunity> opps = [SELECT Id FROM Opportunity WHERE Id IN :Trigger.newMap.keyset()];
+    update opps;
   }
 
   /****************************************
