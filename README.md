@@ -79,7 +79,7 @@ public class OpportunityTriggerHandler extends TriggerHandler {
 }
 ```
 
-## Bypass Other Handlers
+### Bypass API
 
 What if you want to tell other trigger handlers to halt execution? That's easy with the bypass api. Example.
 
