@@ -1,20 +1,26 @@
 public virtual class TriggerHandler {
 
   // static map of handlername, times run() was invoked
-  public static Map<String, LoopCount> loopCountMap;
+  private static Map<String, LoopCount> loopCountMap;
+  private static Set<String> bypassedHandlers;
 
   static {
     loopCountMap = new Map<String, LoopCount>();
+    bypassedHandlers = new Set<String>();
   }
 	
   public TriggerHandler() {
 
   }
 
+  /***************************************
+   * public methods
+   ***************************************/
+
   // main method that will be called during execution
   public void run() {
 
-    validateRun();
+    if(!validateRun()) return;
 
     addToLoopCount();
 
@@ -46,10 +52,30 @@ public virtual class TriggerHandler {
     }
   }
 
+  public void clearMaxLoopCount() {
+    this.setMaxLoopCount(-1);
+  }
+
+  public void bypass(String handlerName) {
+    TriggerHandler.bypassedHandlers.add(handlerName);
+  }
+
+  public void clearBypass(String handlerName) {
+    TriggerHandler.bypassedHandlers.remove(handlerName);
+  }
+
+  public void clearAllBypasses() {
+    TriggerHandler.bypassedHandlers.clear();
+  }
+
+  /***************************************
+   * private methods
+   ***************************************/
+
   private void addToLoopCount() {
     String handlerName = getHandlerName();
     if(TriggerHandler.loopCountMap.containsKey(handlerName)) {
-      Boolean exceeded = TriggerHandler.loopCountMap.get(handlerName).inc();
+      Boolean exceeded = TriggerHandler.loopCountMap.get(handlerName).increment();
       if(exceeded) {
         Integer max = TriggerHandler.loopCountMap.get(handlerName).max;
         throw new TriggerHandlerException('Maximum loop count of ' + String.valueOf(max) + ' reached in ' + handlerName);
@@ -58,15 +84,23 @@ public virtual class TriggerHandler {
   }
 
   // make sure this trigger should continue to run
-  private void validateRun() {
+  private Boolean validateRun() {
     if(!Trigger.isExecuting) {
       throw new TriggerHandlerException('Trigger handler called outside of Trigger execution');
     }
+    if(TriggerHandler.bypassedHandlers.contains(getHandlerName())) {
+      return false;
+    }
+    return true;
   }
 
   private String getHandlerName() {
     return String.valueOf(this).substring(0,String.valueOf(this).indexOf(':'));
   }
+
+  /***************************************
+   * context methods
+   ***************************************/
 
   // context-specific methods for override
   protected virtual void beforeInsert(){}
@@ -76,6 +110,10 @@ public virtual class TriggerHandler {
   protected virtual void afterUpdate(){}
   protected virtual void afterDelete(){}
   protected virtual void afterUndelete(){}
+
+  /***************************************
+   * inner classes
+   ***************************************/
 
   // inner class for managing the loop count per handler
   private class LoopCount {
@@ -92,10 +130,17 @@ public virtual class TriggerHandler {
       this.count = 0;
     }
 
-    public Boolean inc() {
+    public Boolean increment() {
       this.count++;
-      if(this.count <= max) return false;
-      return true; 
+      return this.exceeded();
+    }
+
+    public Boolean exceeded() {
+      if(this.max < 0) return false;
+      if(this.count > this.max) {
+        return true;
+      }
+      return false;
     }
 
     public Integer getMax() {

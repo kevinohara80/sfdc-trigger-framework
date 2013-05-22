@@ -32,7 +32,7 @@ public class OpportunityTriggerHandler extends TriggerHandler {
 }
 ```
 
-**Note:** When referencing the Trigger statics within a class, SObjects are returned versus SObject subclasses like Opportunity, Account, etc. This means that you must cast when you reference them in your trigger handler. You could do this in your constructor if you wanted. Just remember to call super() at the end to run the parent's constructor. Right now, there is no logic in the parent's constructor but there could be one day.
+**Note:** When referencing the Trigger statics within a class, SObjects are returned versus SObject subclasses like Opportunity, Account, etc. This means that you must cast when you reference them in your trigger handler. You could do this in your constructor if you wanted. 
 
 ```java
 public class OpportunityTriggerHandler extends TriggerHandler {
@@ -41,7 +41,6 @@ public class OpportunityTriggerHandler extends TriggerHandler {
 
   public OpportunityTriggerHandler() {
     this.newOppMap = (Map<Id, Opportunity>) Trigger.newMap;
-    super();
   }
   
   public override void afterUpdate() {
@@ -58,6 +57,53 @@ trigger OpportunityTrigger on Opportunity (before insert, before update) {
   new OpportunityTriggerHandler().run();
 }
 ```
+
+## Cool Stuff
+
+### Max Loop Count
+
+To prevent recursion, you can set a max loop count for Trigger Handler. If this max is exceeded, and exception will be thrown. A great use case is when you want to ensure that your trigger runs once and only once within a single execution. Example:
+
+```java
+public class OpportunityTriggerHandler extends TriggerHandler {
+
+  public OpportunityTriggerHandler() {
+    this.setMaxLoopCount(1);
+  }
+  
+  public override void afterUpdate() {
+    List<Opportunity> opps = [SELECT Id FROM Opportunity WHERE Id IN :Trigger.newMap.keySet()];
+    update opps; // this will throw after this update
+  }
+
+}
+```
+
+## Bypass Other Handlers
+
+What if you want to tell other trigger handlers to halt execution? That's easy with the bypass api. Example.
+
+```java
+public class OpportunityTriggerHandler extends TriggerHandler {
+  
+  public override void afterUpdate() {
+    List<Opportunity> opps = [SELECT Id, AccountId FROM Opportunity WHERE Id IN :Trigger.newMap.keySet()];
+    
+    Account acc = [SELECT Id, Name FROM Account WHERE Id = :opps.get(0).AccountId];
+
+    this.bypass('AccountTriggerHandler');
+
+    acc.Name = 'No Trigger';
+    update acc; // won't invoke the AccountTriggerHandler
+
+    this.clearBypass('AccountTriggerHandler');
+
+  }
+
+}
+```
+
+## Overridable Methods
 
 Here are all of the methods that you can override. All of the context possibilities are supported.
 
