@@ -64,6 +64,10 @@ public virtual class TriggerHandler {
     TriggerHandler.bypassedHandlers.remove(handlerName);
   }
 
+  public Boolean isBypassed(String handlerName) {
+    return TriggerHandler.bypassedHandlers.contains(handlerName);
+  }
+
   public void clearAllBypasses() {
     TriggerHandler.bypassedHandlers.clear();
   }

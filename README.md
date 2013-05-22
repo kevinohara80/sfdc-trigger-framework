@@ -98,6 +98,9 @@ public class OpportunityTriggerHandler extends TriggerHandler {
 
     this.clearBypass('AccountTriggerHandler');
 
+    acc.Name = 'With Trigger';
+    update acc; // will invoke the AccountTriggerHandler
+
   }
 
 }
