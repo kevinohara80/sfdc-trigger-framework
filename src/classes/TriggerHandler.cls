@@ -95,6 +95,16 @@ public virtual class TriggerHandler {
     if(TriggerHandler.bypassedHandlers.contains(getHandlerName())) {
       return false;
     }
+    
+    //Provides mechanism for turning triggers off via the Trigger Enablement custom setting,
+    //a hierarchical custom setting that may be set per User (e.g. for Integration purposes)
+    String csOverrideField csOverrideField = getCustomSettingField();
+    if(csOverrideField != null){
+      Trigger_Enablement__c customSetting = Trigger_Enablement__c.getInstance();
+      if(customSetting != null && customSetting.get(field) != null && !(Boolean)customSetting.get(field)){
+        return false;
+      }
+    }
     return true;
   }
 
@@ -114,6 +124,11 @@ public virtual class TriggerHandler {
   protected virtual void afterUpdate(){}
   protected virtual void afterDelete(){}
   protected virtual void afterUndelete(){}
+  
+  //In order to use the trigger enablement feature, then the implementing class must
+  //override this method to return the api name associated with a boolean custom setting field for
+  //Disabling the given trigger.
+  protected virtual String getCustomSettingField(){ return null; }
 
   /***************************************
    * inner classes
