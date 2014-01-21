@@ -95,12 +95,12 @@ public class OpportunityTriggerHandler extends TriggerHandler {
     
     Account acc = [SELECT Id, Name FROM Account WHERE Id = :opps.get(0).AccountId];
 
-    this.bypass('AccountTriggerHandler');
+    TriggerHandler.bypass('AccountTriggerHandler');
 
     acc.Name = 'No Trigger';
     update acc; // won't invoke the AccountTriggerHandler
 
-    this.clearBypass('AccountTriggerHandler');
+    TriggerHandler.clearBypass('AccountTriggerHandler');
 
     acc.Name = 'With Trigger';
     update acc; // will invoke the AccountTriggerHandler
