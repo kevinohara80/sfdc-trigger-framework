@@ -56,19 +56,19 @@ public virtual class TriggerHandler {
     this.setMaxLoopCount(-1);
   }
 
-  public void bypass(String handlerName) {
+  public static void bypass(String handlerName) {
     TriggerHandler.bypassedHandlers.add(handlerName);
   }
 
-  public void clearBypass(String handlerName) {
+  public static void clearBypass(String handlerName) {
     TriggerHandler.bypassedHandlers.remove(handlerName);
   }
 
-  public Boolean isBypassed(String handlerName) {
+  public static Boolean isBypassed(String handlerName) {
     return TriggerHandler.bypassedHandlers.contains(handlerName);
   }
 
-  public void clearAllBypasses() {
+  public static void clearAllBypasses() {
     TriggerHandler.bypassedHandlers.clear();
   }
 
