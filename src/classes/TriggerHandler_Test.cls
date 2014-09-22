@@ -1,12 +1,3 @@
-//https://developer.salesforce.com/page/Virtual_Callout_Testing
-//http://salesforce.stackexchange.com/questions/46107/trigger-context-system-trigger-class
-//http://developer.force.com/cookbook/recipe/trigger-pattern-for-tidy-streamlined-bulkified-triggers
-//https://www.salesforce.com/us/developer/docs/apexcode/index_Left.htm#CSHID=apex_classes_example.htm|StartTopic=Content%2Fapex_classes_example.htm|SkinName=webhelp
-//http://www.salesforce.com/us/developer/docs/apexcode/Content/apex_classes_defining.htm
-//http://jessealtman.com/2014/06/apexmocks-how-does-it-work/
-//http://carvingintheclouds.blogspot.com/2013/10/forcecom-tested-standard-pattern-for.html
-//http://salesforce.stackexchange.com/questions/24218/how-to-perform-mock-testing-on-apex-classes
-//https://www.salesforce.com/us/developer/docs/apexcode/Content/apex_testing_testvisible.htm
 @isTest (SeeAllData=true)
 public class TriggerHandler_Test{
 
