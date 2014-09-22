@@ -1,8 +1,8 @@
 public virtual class TriggerHandler {
 
   // static map of handlername, times run() was invoked
-  private static Map<String, LoopCount> loopCountMap;
-  private static Set<String> bypassedHandlers;
+  @TestVisible private static Map<String, LoopCount> loopCountMap;
+  @TestVisible private static Set<String> bypassedHandlers;
 
   static {
     loopCountMap = new Map<String, LoopCount>();
@@ -76,7 +76,7 @@ public virtual class TriggerHandler {
    * private methods
    ***************************************/
 
-  private void addToLoopCount() {
+  @TestVisible private void addToLoopCount() {
     String handlerName = getHandlerName();
     if(TriggerHandler.loopCountMap.containsKey(handlerName)) {
       Boolean exceeded = TriggerHandler.loopCountMap.get(handlerName).increment();
@@ -120,7 +120,8 @@ public virtual class TriggerHandler {
    ***************************************/
 
   // inner class for managing the loop count per handler
-  private class LoopCount {
+  
+  @TestVisible private class LoopCount {
     private Integer max;
     private Integer count;
 
