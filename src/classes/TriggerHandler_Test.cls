@@ -1,3 +1,12 @@
+//https://developer.salesforce.com/page/Virtual_Callout_Testing
+//http://salesforce.stackexchange.com/questions/46107/trigger-context-system-trigger-class
+//http://developer.force.com/cookbook/recipe/trigger-pattern-for-tidy-streamlined-bulkified-triggers
+//https://www.salesforce.com/us/developer/docs/apexcode/index_Left.htm#CSHID=apex_classes_example.htm|StartTopic=Content%2Fapex_classes_example.htm|SkinName=webhelp
+//http://www.salesforce.com/us/developer/docs/apexcode/Content/apex_classes_defining.htm
+//http://jessealtman.com/2014/06/apexmocks-how-does-it-work/
+//http://carvingintheclouds.blogspot.com/2013/10/forcecom-tested-standard-pattern-for.html
+//http://salesforce.stackexchange.com/questions/24218/how-to-perform-mock-testing-on-apex-classes
+//https://www.salesforce.com/us/developer/docs/apexcode/Content/apex_testing_testvisible.htm
 @isTest (SeeAllData=true)
 public class TriggerHandler_Test{
 
@@ -14,7 +23,7 @@ public class TriggerHandler_Test{
     }    
     
     @isTest static void test_Run(){
-        Account acc = new Account(Name = 'Account');
+        Account acc = TestUtilities.generateAccount();
         Insert acc;
         Update acc;
         Delete acc;
@@ -27,7 +36,7 @@ public class TriggerHandler_Test{
             t.run();
         }
         catch(Exception e){
-		System.assertEquals(TRUE,e.getMessage().contains('Trigger handler called outside of Trigger execution'));
+			System.assertEquals(TRUE,e.getMessage().contains('Trigger handler called outside of Trigger execution'));
         }
     }
     @isTest static void test_LoopCount(){
@@ -94,79 +103,3 @@ public class TriggerHandler_Test{
     }
     
 }
-
-/*
-	@isTest static void test_Triggers() {
-
-        System.debug('Begin TriggerHandler_Test.test_Triggers()');
-		//create object
-        //activate trigger
-	    //confirm run    
-        
-        Account acc = TestUtilities.generateAccount();
-		System.debug('Account: ' + acc);
-        Insert acc;
-        System.assert(acc.Id <> null);
-        
-        Mode__c mod = TestUtilities.generateMode(acc,'parcel');
-		System.debug('Mode: ' + acc);
-		Insert mod;
-        System.assert(mod.Id <> null);
-        
-        Asset ast = TestUtilities.generateAsset(acc);
-        System.debug('Asset: ' + ast);
-        Insert ast;
-        System.assert(ast.Id <> null);
-        
-        Opportunity opp = TestUtilities.generateOpportunity(acc);
-        System.debug('Opportunity: ' + opp);
-        Insert opp;
-        System.assert(opp.Id <> null);
-        
-        OpportunityTeamMember otm = TestUtilities.generateOpportunityTeamMember(opp);
-        System.debug('OpportunityTeamMember: ' + otm);
-        Insert otm;
-        System.assert(otm.Id <> null);
-
-        Product2 pd2 = TestUtilities.generateProduct2();
-        System.debug('Product2: ' + pd2);
-		Insert pd2;
-        System.assert(pd2.Id <> null);
-
-        PriceBookEntry pbe = TestUtilities.generatePriceBookEntry(pd2);
-        System.debug('PriceBookEntry: ' + pbe);
-		Insert pbe;
-        System.assert(pbe.Id <> null);
-
-        OpportunityLineItem oli = TestUtilities.generateOpportunityLineItem(opp,pbe);
-        System.debug('OpportunityLineItem: ' + oli);
-        Insert otm;
-        System.assert(otm.Id <> null);
-        
-	}
-
-	@isTest static void test_run() {
-		// Implement test code
-	}
-	
-	@isTest static void test_setMaxLoopCount() {
-		// Implement test code
-	}
-
-	@isTest static void test_clearMaxLoopCount() {
-		// Implement test code
-	}
-    
-	@isTest static void test_clearBypass() {
-		// Implement test code
-	}
-    
-	@isTest static void test_isByPassed() {
-		// Implement test code
-	}
-
-    @isTest static void tes_cleaAllBypasses() {
-		// Implement test code
-	}
-
-*/
