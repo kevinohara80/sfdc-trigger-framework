@@ -14,7 +14,8 @@ public class TriggerHandler_Test{
     }    
     
     @isTest static void test_Run(){
-        Account acc = TestUtilities.generateAccount();
+        Account acc = new Account();
+        acc.Name = 'Test Account';
         Insert acc;
         Update acc;
         Delete acc;
@@ -27,7 +28,7 @@ public class TriggerHandler_Test{
             t.run();
         }
         catch(Exception e){
-			System.assertEquals(TRUE,e.getMessage().contains('Trigger handler called outside of Trigger execution'));
+		System.assertEquals(TRUE,e.getMessage().contains('Trigger handler called outside of Trigger execution'));
         }
     }
     @isTest static void test_LoopCount(){
