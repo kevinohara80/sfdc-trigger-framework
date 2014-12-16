@@ -4,17 +4,27 @@ public virtual class TriggerHandler {
   private static Map<String, LoopCount> loopCountMap;
   private static Set<String> bypassedHandlers;
 
+  // the current context of the trigger, overridable in tests
+  @TestVisible
+  private TriggerContext context;
+
+  // the current context of the trigger, overridable in tests
+  @TestVisible
+  private Boolean isTriggerExecuting;
+
+  // static initialization
   static {
     loopCountMap = new Map<String, LoopCount>();
     bypassedHandlers = new Set<String>();
   }
-	
+  
+  // constructor
   public TriggerHandler() {
-
+    this.setTriggerContext();
   }
 
   /***************************************
-   * public methods
+   * public instance methods
    ***************************************/
 
   // main method that will be called during execution
@@ -25,19 +35,19 @@ public virtual class TriggerHandler {
     addToLoopCount();
 
     // dispatch to the correct handler method
-    if(Trigger.isBefore && Trigger.isInsert) {
+    if(this.context == TriggerContext.BEFORE_INSERT) {
       this.beforeInsert();
-    } else if(Trigger.isBefore && Trigger.isUpdate) {
+    } else if(this.context == TriggerContext.BEFORE_UPDATE) {
       this.beforeUpdate();
-    } else if(Trigger.isBefore && Trigger.isDelete) {
+    } else if(this.context == TriggerContext.BEFORE_DELETE) {
       this.beforeDelete();
-    } else if(Trigger.isAfter && Trigger.isInsert) {
+    } else if(this.context == TriggerContext.AFTER_INSERT) {
       this.afterInsert();
-    } else if(Trigger.isAfter && Trigger.isUpdate) {
+    } else if(this.context == TriggerContext.AFTER_UPDATE) {
       this.afterUpdate();
-    } else if(Trigger.isAfter && Trigger.isDelete) {
+    } else if(this.context == TriggerContext.AFTER_DELETE) {
       this.afterDelete();
-    } else if(Trigger.isAfter && Trigger.isUndelete) {
+    } else if(this.context == TriggerContext.AFTER_UNDELETE) {
       this.afterUndelete();
     }
 
@@ -56,6 +66,10 @@ public virtual class TriggerHandler {
     this.setMaxLoopCount(-1);
   }
 
+  /***************************************
+   * public static methods
+   ***************************************/
+
   public static void bypass(String handlerName) {
     TriggerHandler.bypassedHandlers.add(handlerName);
   }
@@ -73,9 +87,49 @@ public virtual class TriggerHandler {
   }
 
   /***************************************
-   * private methods
+   * private instancemethods
    ***************************************/
 
+  @TestVisible
+  private void setTriggerContext() {
+    this.setTriggerContext(null, false);
+  }
+
+  @TestVisible
+  private void setTriggerContext(String ctx, Boolean testMode) {
+    if(!Trigger.isExecuting && !testMode) {
+      this.isTriggerExecuting = false;
+      return;
+    } else {
+      this.isTriggerExecuting = true;
+    }
+    
+    if((Trigger.isExecuting && Trigger.isBefore && Trigger.isInsert) ||
+        (ctx != null && ctx == 'before insert')) {
+      this.context = TriggerContext.BEFORE_INSERT;
+    } else if((Trigger.isExecuting && Trigger.isBefore && Trigger.isUpdate) ||
+        (ctx != null && ctx == 'before update')){
+      this.context = TriggerContext.BEFORE_UPDATE;
+    } else if((Trigger.isExecuting && Trigger.isBefore && Trigger.isDelete) ||
+        (ctx != null && ctx == 'before delete')) {
+      this.context = TriggerContext.BEFORE_DELETE;
+    } else if((Trigger.isExecuting && Trigger.isAfter && Trigger.isInsert) ||
+        (ctx != null && ctx == 'after insert')) {
+      this.context = TriggerContext.AFTER_INSERT;
+    } else if((Trigger.isExecuting && Trigger.isAfter && Trigger.isUpdate) ||
+        (ctx != null && ctx == 'after update')) {
+      this.context = TriggerContext.AFTER_UPDATE;
+    } else if((Trigger.isExecuting && Trigger.isAfter && Trigger.isDelete) ||
+        (ctx != null && ctx == 'after delete')) {
+      this.context = TriggerContext.AFTER_DELETE;
+    } else if((Trigger.isExecuting && Trigger.isAfter && Trigger.isUndelete) ||
+        (ctx != null && ctx == 'after undelete')) {
+      this.context = TriggerContext.AFTER_UNDELETE;
+    }
+  }
+
+  // increment the loop count
+  @TestVisible
   private void addToLoopCount() {
     String handlerName = getHandlerName();
     if(TriggerHandler.loopCountMap.containsKey(handlerName)) {
@@ -88,8 +142,9 @@ public virtual class TriggerHandler {
   }
 
   // make sure this trigger should continue to run
+  @TestVisible
   private Boolean validateRun() {
-    if(!Trigger.isExecuting) {
+    if(!this.isTriggerExecuting || this.context == null) {
       throw new TriggerHandlerException('Trigger handler called outside of Trigger execution');
     }
     if(TriggerHandler.bypassedHandlers.contains(getHandlerName())) {
@@ -98,6 +153,7 @@ public virtual class TriggerHandler {
     return true;
   }
 
+  @TestVisible
   private String getHandlerName() {
     return String.valueOf(this).substring(0,String.valueOf(this).indexOf(':'));
   }
@@ -107,12 +163,19 @@ public virtual class TriggerHandler {
    ***************************************/
 
   // context-specific methods for override
+  @TestVisible
   protected virtual void beforeInsert(){}
+  @TestVisible
   protected virtual void beforeUpdate(){}
+  @TestVisible
   protected virtual void beforeDelete(){}
+  @TestVisible
   protected virtual void afterInsert(){}
+  @TestVisible
   protected virtual void afterUpdate(){}
+  @TestVisible
   protected virtual void afterDelete(){}
+  @TestVisible
   protected virtual void afterUndelete(){}
 
   /***************************************
@@ -120,6 +183,7 @@ public virtual class TriggerHandler {
    ***************************************/
 
   // inner class for managing the loop count per handler
+  @TestVisible
   private class LoopCount {
     private Integer max;
     private Integer count;
@@ -158,6 +222,14 @@ public virtual class TriggerHandler {
     public void setMax(Integer max) {
       this.max = max;
     }
+  }
+
+  // possible trigger contexts
+  @TestVisible
+  private enum TriggerContext {
+    BEFORE_INSERT, BEFORE_UPDATE, BEFORE_DELETE,
+    AFTER_INSERT, AFTER_UPDATE, AFTER_DELETE,
+    AFTER_UNDELETE
   }
 
   // exception class
