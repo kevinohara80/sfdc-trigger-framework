@@ -183,10 +183,10 @@ private class TriggerHandler_Test {
 
   // private method tests
 
-	@isTest 
+  @isTest 
   static void testGetHandlerName() {
     System.assertEquals('TestHandler', handler.getHandlerName(), 'handler name should match class name');
-	}
+  }
 
   // test virtual methods
   
