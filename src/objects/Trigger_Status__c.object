@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>List</customSettingsType>
+    <description>The triggers for the org and the active/inactive status for them.</description>
+    <enableFeeds>false</enableFeeds>
+    <fields>
+        <fullName>Status__c</fullName>
+        <defaultValue>false</defaultValue>
+        <externalId>false</externalId>
+        <inlineHelpText>Checked means the trigger is active and will fire.</inlineHelpText>
+        <label>Status</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <label>Trigger Status</label>
+    <visibility>Protected</visibility>
+</CustomObject>
