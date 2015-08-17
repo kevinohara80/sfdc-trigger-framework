@@ -122,5 +122,62 @@ Here are all of the methods that you can override. All of the context possibilit
 * `afterDelete()`
 * `afterUndelete()`
 
+## Modifications by Greg Hacic
 
+These modificatiosn were introduced on 17 August 2015
 
+### New Items
+- Trigger_Status__c.object
+- triggerUtil.cls
+- triggerUtilTest.cls
+
+Created the Trigger_Status__c Custom Setting object so that administrators / developers have the option of turning a trigger on or off without having to deploy any code.
+
+In an effort to keep things clear to other developers, I created a new class for the logic that checks the trigger status as defined in the new Custom Setting object. That class is labeled `triggerUtil` and the tests for it are located in `triggerUtilTest.cls`.
+
+### How to Use
+
+#### Create a record for the Trigger
+
+Create a new record in the Trigger_Status__c Custom Setting object.
+
+1. Navigate to **Setup** > **Develop** > **Custom Settings**.
+2. Click the **Manage** link located on the left-hand side of the Custom Setting reading **Trigger Status**.
+3. Click the **New** button.
+4. Provide a Name for the trigger, which should match the name you will use in the handler class, and check the box reading **Status**.
+
+#### Modify the Trigger Handler Class
+
+You will need to check the status of the trigger by calling the isTriggerOkayToRun method in the handler class. See below for an example
+
+```java
+public class opportunityTriggerHandler extends TriggerHandler {
+	
+	private Boolean isOkayToRun; //boolean denoting whether or not we should run the trigger logic
+	private Map<Id, Opportunity> newRecordMap; //map of new records
+	private Map<Id, Opportunity> oldRecordMap; //map of old records
+	private List<Opportunity> newRecords; //list of new records
+	private List<Opportunity> oldRecords; //list of old records
+	
+	//constructor
+	public opportunityTriggerHandler() {
+		isOkayToRun = triggerUtil.isTriggerOkayToRun('OpportunityTrigger'); //determine whether or not the trigger logic is okay to run > there should be a record with the Name = 'OpportunityTrigger' in the Trigger_Status__c Custom Setting
+		newRecordMap = (Map<Id, Opportunity>)Trigger.newMap; //cast the map of new records
+		newRecords = (List<Opportunity>)Trigger.new;  //cast the list of new records
+		oldRecordMap = (Map<Id, Opportunity>)Trigger.oldMap; //cast the map of old records
+		oldRecords = (List<Opportunity>)Trigger.old; //cast the list of old records
+	}
+	
+	//override the afterInsert trigger context
+	public override void afterInsert(){
+		if (isOkayToRun) { //if it is okay to run the trigger
+			for (Opportunity o : newRecords) { //for each new Opportunity record
+				//do something...
+			}
+		}
+	}
+
+}
+```
+
+If there is no matching record in the Trigger_Status__c Custom Setting object corresponding to the trigger name then the trigger will fire.
