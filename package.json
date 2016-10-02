@@ -1,10 +1,12 @@
 {
   "name": "sfdc-trigger-framework",
-  "version": "1.0.0",
-  "description": "1.1.0",
+  "version": "1.1.0",
+  "description": "A minimal trigger framework for your Salesforce Apex Triggers",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postversion": "git push && git push --tags",
+    "postinstall": "node -e \"require('sfdc-pkg-postinstall').install()\""
   },
   "repository": {
     "type": "git",
@@ -21,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/kevinohara80/sfdc-trigger-framework/issues"
   },
-  "homepage": "https://github.com/kevinohara80/sfdc-trigger-framework#readme"
+  "homepage": "https://github.com/kevinohara80/sfdc-trigger-framework#readme",
+  "dependencies": {
+    "sfdc-pkg-postinstall": "^1.0.0-2"
+  }
 }
