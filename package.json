@@ -1,6 +1,6 @@
 {
   "name": "sfdc-trigger-framework",
-  "version": "1.2.0-11",
+  "version": "1.2.0-12",
   "description": "A minimal trigger framework for your Salesforce Apex Triggers",
   "main": "index.js",
   "scripts": {
