@@ -25,6 +25,6 @@
   },
   "homepage": "https://github.com/kevinohara80/sfdc-trigger-framework#readme",
   "dependencies": {
-    "sfdc-pkg-postinstall": "^1.0.0-11"
+    "sfdc-pkg-postinstall": "^1.0.0-12"
   }
 }
