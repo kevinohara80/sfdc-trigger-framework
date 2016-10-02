@@ -1,0 +1,25 @@
+{
+  "name": "sfdc-trigger-framework",
+  "version": "1.0.0",
+  "description": "1.1.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevinohara80/sfdc-trigger-framework.git"
+  },
+  "keywords": [
+    "sfdc-package",
+    "trigger",
+    "framework",
+    "salesforce"
+  ],
+  "author": "Kevin O'Hara",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kevinohara80/sfdc-trigger-framework/issues"
+  },
+  "homepage": "https://github.com/kevinohara80/sfdc-trigger-framework#readme"
+}
