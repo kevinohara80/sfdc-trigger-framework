@@ -1,5 +1,7 @@
 # SFDC trigger framework
 
+[![npm version](https://badge.fury.io/js/sfdc-trigger-framework.svg)](https://badge.fury.io/js/sfdc-trigger-framework)
+
 I know, I know...another trigger framework. Bear with me. ;)
 
 ## Overview
