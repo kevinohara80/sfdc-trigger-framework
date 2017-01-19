@@ -150,6 +150,10 @@ public virtual class TriggerHandler {
     if(TriggerHandler.bypassedHandlers.contains(getHandlerName())) {
       return false;
     }
+    List<BypassTrigger__c> settings = BypassTrigger__c.getall().values();
+    for (BypassTrigger__c stg : settings)
+        if (stg.Name == getHandlerName() && stg.Bypass__c == true)
+          return false;
     return true;
   }
 
