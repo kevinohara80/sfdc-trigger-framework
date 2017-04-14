@@ -5,7 +5,10 @@ public virtual class TriggerHandler implements Queueable {
   private static Set<String> bypassedHandlers;
 
   // private sobject maps
+  @TestVisible
   private Map<Id, SObject> newMap;
+  
+  @TestVisible
   private Map<Id, SObject> oldMap;
 
   // the current context of the trigger, overridable in tests
@@ -18,7 +21,7 @@ public virtual class TriggerHandler implements Queueable {
 
   // flag to denote an asunc trigger;
   @TestVisible
-  private Boolean isAsync;
+  private Boolean isAsyncContext;
 
   // static initialization
   static {
@@ -34,13 +37,13 @@ public virtual class TriggerHandler implements Queueable {
       this.oldMap = Trigger.oldMap;
     }
 
-    this.isAsync = false;
+    this.isAsyncContext = false;
 
     this.setTriggerContext();
   }
 
   public void execute(QueueableContext qc) {
-    this.isAsync = true;
+    this.isAsyncContext = true;
     this.clearMaxLoopCount();
     this.run();
   }
@@ -93,6 +96,10 @@ public virtual class TriggerHandler implements Queueable {
 
   public Id runAsync() {
     return System.enqueueJob(this);
+  }
+
+  public Boolean isAsync() {
+    return (this.isAsyncContext != null) ? this.isAsyncContext : false;
   }
 
   public void setMaxLoopCount(Integer max) {
@@ -186,7 +193,7 @@ public virtual class TriggerHandler implements Queueable {
   // make sure this trigger should continue to run
   @TestVisible
   private Boolean validateRun() {
-    if(!this.isTriggerExecuting || this.context == null) {
+    if((!this.isTriggerExecuting && !this.isAsyncContext) || this.context == null) {
       throw new TriggerHandlerException('Trigger handler called outside of Trigger execution');
     }
     if(TriggerHandler.bypassedHandlers.contains(getHandlerName())) {
