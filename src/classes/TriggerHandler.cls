@@ -1,8 +1,12 @@
-public virtual class TriggerHandler {
+public virtual class TriggerHandler implements Queueable {
 
   // static map of handlername, times run() was invoked
   private static Map<String, LoopCount> loopCountMap;
   private static Set<String> bypassedHandlers;
+
+  // private sobject maps
+  private Map<Id, SObject> newMap;
+  private Map<Id, SObject> oldMap;
 
   // the current context of the trigger, overridable in tests
   @TestVisible
@@ -12,6 +16,10 @@ public virtual class TriggerHandler {
   @TestVisible
   private Boolean isTriggerExecuting;
 
+  // flag to denote an asunc trigger;
+  @TestVisible
+  private Boolean isAsync;
+
   // static initialization
   static {
     loopCountMap = new Map<String, LoopCount>();
@@ -20,12 +28,42 @@ public virtual class TriggerHandler {
   
   // constructor
   public TriggerHandler() {
+    
+    if(Trigger.isExecuting) {
+      this.newMap = Trigger.newMap;
+      this.oldMap = Trigger.oldMap;
+    }
+
+    this.isAsync = false;
+
     this.setTriggerContext();
+  }
+
+  public void execute(QueueableContext qc) {
+    this.isAsync = true;
+    this.clearMaxLoopCount();
+    this.run();
   }
 
   /***************************************
    * public instance methods
    ***************************************/
+
+   public Map<Id, SObject> getNewMap() {
+     return (this.newMap != null) ? this.newMap : new Map<Id, SObject>();
+   }
+
+   public Map<Id, SObject> getOldMap() {
+     return (this.oldMap != null) ? this.oldMap : new Map<Id, SObject>();
+   }
+
+   public List<SObject> getNewList() {
+     return (this.newMap != null) ? this.newMap.values() : new List<SObject>();
+   }
+
+   public List<SObject> getOldList() {
+     return (this.oldMap != null) ? this.oldMap.values() : new List<SObject>();
+   }
 
   // main method that will be called during execution
   public void run() {
@@ -51,6 +89,10 @@ public virtual class TriggerHandler {
       this.afterUndelete();
     }
 
+  }
+
+  public Id runAsync() {
+    return System.enqueueJob(this);
   }
 
   public void setMaxLoopCount(Integer max) {
@@ -87,7 +129,7 @@ public virtual class TriggerHandler {
   }
 
   /***************************************
-   * private instancemethods
+   * private instance methods
    ***************************************/
 
   @TestVisible
