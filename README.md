@@ -87,7 +87,7 @@ public class OpportunityTriggerHandler extends TriggerHandler {
 
 ### Bypass API
 
-What if you want to tell other trigger handlers to halt execution? That's easy with the bypass api. Example.
+What if you want to tell other trigger handlers to halt execution? That's easy with the bypass api:
 
 ```java
 public class OpportunityTriggerHandler extends TriggerHandler {
@@ -112,6 +112,24 @@ public class OpportunityTriggerHandler extends TriggerHandler {
 }
 ```
 
+If you need to check if a handler is bypassed, use the `isBypassed` method:
+
+```java
+if (TriggerHandler.isBypassed('AccountTriggerHandler')) {
+  // ... do something if the Account trigger handler is bypassed!
+}
+```
+
+If you want to clear all bypasses for the transaction, simple use the `clearAllBypasses` method, as in:
+
+```java
+// ... done with bypasses!
+
+TriggerHandler.clearAllBypasses();
+
+// ... now handlers won't be ignored!
+```
+
 ## Overridable Methods
 
 Here are all of the methods that you can override. All of the context possibilities are supported.
@@ -123,6 +141,3 @@ Here are all of the methods that you can override. All of the context possibilit
 * `afterUpdate()`
 * `afterDelete()`
 * `afterUndelete()`
-
-
-
