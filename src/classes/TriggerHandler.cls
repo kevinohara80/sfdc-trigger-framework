@@ -51,6 +51,7 @@ public virtual class TriggerHandler {
       this.afterUndelete();
     }
 
+    System.debug(LoggingLevel.INFO, this.context + '(' + getHandlerName() + ')');
   }
 
   public void setMaxLoopCount(Integer max) {
@@ -74,8 +75,20 @@ public virtual class TriggerHandler {
     TriggerHandler.bypassedHandlers.add(handlerName);
   }
 
+  public static void bypass(List<String> handlersNames) {
+    for (String handlerName : handlersNames) {
+      bypass(handlerName);
+    }
+  }
+
   public static void clearBypass(String handlerName) {
     TriggerHandler.bypassedHandlers.remove(handlerName);
+  }
+
+  public static void clearBypass(List<String> handlersNames) {
+    for (String handlerName : handlersNames) {
+      clearBypass(handlerName);
+    }
   }
 
   public static Boolean isBypassed(String handlerName) {

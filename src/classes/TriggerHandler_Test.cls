@@ -93,6 +93,17 @@ private class TriggerHandler_Test {
     System.assertEquals(true, TriggerHandler.isBypassed('TestHandler'), 'test handler should be bypassed');
     resetTest();
 
+    // test multiple bypasses and bypass clear
+    TriggerHandler.bypass(new List<String>{'FirstHandler', 'SecondHandler'});
+    handler.run();
+    System.assertEquals(null, lastMethodCalled, 'last method should be null when bypassed');
+    System.assertEquals(true, TriggerHandler.isBypassed('FirstHandler'), 'first test handler should be bypassed');
+    System.assertEquals(true, TriggerHandler.isBypassed('SecondHandler'), 'second test handler should be bypassed');
+    TriggerHandler.clearBypass(new List<String>{'FirstHandler', 'SecondHandler'});
+    System.assertEquals(false, TriggerHandler.isBypassed('FirstHandler'), 'first test handler should not be bypassed');
+    System.assertEquals(false, TriggerHandler.isBypassed('SecondHandler'), 'second test handler should not be bypassed');
+    resetTest();
+
     // clear that bypass and run handler
     TriggerHandler.clearBypass('TestHandler');
     handler.run();
