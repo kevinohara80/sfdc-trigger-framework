@@ -50,8 +50,6 @@ public virtual class TriggerHandler {
     } else if(this.context == TriggerContext.AFTER_UNDELETE) {
       this.afterUndelete();
     }
-
-    System.debug(LoggingLevel.INFO, this.context + '(' + getHandlerName() + ')');
   }
 
   public void setMaxLoopCount(Integer max) {
