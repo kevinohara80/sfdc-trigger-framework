@@ -3,6 +3,8 @@ public virtual class TriggerHandler {
   // static map of handlername, times run() was invoked
   private static Map<String, LoopCount> loopCountMap;
   private static Set<String> bypassedHandlers;
+  @testVisible private static Boolean globalBypass;
+  @testVisible private static Boolean showLimits;
 
   // the current context of the trigger, overridable in tests
   @TestVisible
@@ -16,6 +18,8 @@ public virtual class TriggerHandler {
   static {
     loopCountMap = new Map<String, LoopCount>();
     bypassedHandlers = new Set<String>();
+    globalBypass = false;
+    showLimits = false;
   }
   
   // constructor
@@ -50,6 +54,15 @@ public virtual class TriggerHandler {
     } else if(this.context == TriggerContext.AFTER_UNDELETE) {
       this.afterUndelete();
     }
+
+    if (showLimits) {
+      System.debug(LoggingLevel.DEBUG, String.format('{0} on {1} ({2}/{3})', new List<String>{
+        this.context+'',
+        getHandlerName(),
+        Limits.getQueries()+'',
+        Limits.getLimitQueries()+''
+      }));
+    }
   }
 
   public void setMaxLoopCount(Integer max) {
@@ -79,6 +92,10 @@ public virtual class TriggerHandler {
     }
   }
 
+  public static void bypassAll() {
+    globalBypass = true;
+  }
+
   public static void clearBypass(String handlerName) {
     TriggerHandler.bypassedHandlers.remove(handlerName);
   }
@@ -95,6 +112,15 @@ public virtual class TriggerHandler {
 
   public static void clearAllBypasses() {
     TriggerHandler.bypassedHandlers.clear();
+    clearGlobalBypass();
+  }
+
+  public static void clearGlobalBypass() {
+    globalBypass = false;
+  }
+
+  public static void showLimits () {
+    showLimits = true;
   }
 
   /***************************************
@@ -159,6 +185,9 @@ public virtual class TriggerHandler {
       throw new TriggerHandlerException('Trigger handler called outside of Trigger execution');
     }
     if(TriggerHandler.bypassedHandlers.contains(getHandlerName())) {
+      return false;
+    }
+    if(globalBypass) {
       return false;
     }
     return true;

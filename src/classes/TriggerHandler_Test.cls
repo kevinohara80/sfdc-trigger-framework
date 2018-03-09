@@ -118,12 +118,28 @@ private class TriggerHandler_Test {
     System.assertEquals(true, TriggerHandler.isBypassed('TestHandler'), 'test handler should be bypassed');
     resetTest();
 
+    // global bypass test
+    TriggerHandler.bypassAll();
+    handler.run();
+    System.assertEquals(null, lastMethodCalled, 'last method should be null when bypassed');
+    System.assertEquals(true, TriggerHandler.globalBypass, 'global bypass should be active');
+    TriggerHandler.clearGlobalBypass();
+    System.assertEquals(false, TriggerHandler.globalBypass, 'global bypass should not be active');
+    resetTest();
+
     // clear all bypasses and run handler
     TriggerHandler.clearAllBypasses();
     handler.run();
     System.assertEquals('afterUpdate', lastMethodCalled, 'last method called should be afterUpdate');
     System.assertEquals(false, TriggerHandler.isBypassed('TestHandler'), 'test handler should be bypassed');
     resetTest();
+  }
+
+  @isTest
+  static void testShowLimits () {
+    // not really possible to test this, I believe, but it is nice to have the coverage.
+    TriggerHandler.showLimits();
+    System.assertEquals(true, TriggerHandler.showLimits);
   }
 
   // instance method tests
@@ -284,5 +300,5 @@ private class TriggerHandler_Test {
     }
 
   }
-	
+  
 }
