@@ -92,8 +92,8 @@ public virtual class TriggerHandler {
         }
     }
 
-    public static void bypass (Type classType) {
-        bypass(classType.getName());
+    public static void bypass (Type handlerType) {
+        bypass(handlerType.getName());
     }
 
     public static void bypassAll () {
@@ -104,8 +104,8 @@ public virtual class TriggerHandler {
         bypassedHandlers.remove(handlerName);
     }
 
-    public static void clearBypass (Type classType) {
-        clearBypass(classType.getName());
+    public static void clearBypass (Type handlerType) {
+        clearBypass(handlerType.getName());
     }
 
     public static void clearBypass (List<String> handlersNames) {
@@ -122,12 +122,19 @@ public virtual class TriggerHandler {
         return bypassedHandlers.contains(handlerName);
     }
 
-    public static Boolean isBypassed (Type classType) {
-        return bypassedHandlers.contains(classType.getName());
+    public static Boolean isBypassed (Type handlerType) {
+        return bypassedHandlers.contains(handlerType.getName());
     }
 
     public static void showLimits () {
         showLimits = true;
+    }
+
+    public static Integer getLoopCount (String handlerName) {
+        if (TriggerHandler.loopCountMap.containsKey(handlerName)) {
+            return TriggerHandler.loopCountMap.get(handlerName).getCount();
+        }
+        return 0;
     }
 
     /***************************************
@@ -151,22 +158,22 @@ public virtual class TriggerHandler {
         if ((Trigger.isExecuting && Trigger.isBefore && Trigger.isInsert) ||
             (ctx != null && ctx == 'before insert')) {
             this.context = TriggerContext.BEFORE_INSERT;
-        } else if((Trigger.isExecuting && Trigger.isBefore && Trigger.isUpdate) ||
+        } else if ((Trigger.isExecuting && Trigger.isBefore && Trigger.isUpdate) ||
             (ctx != null && ctx == 'before update')){
             this.context = TriggerContext.BEFORE_UPDATE;
-        } else if((Trigger.isExecuting && Trigger.isBefore && Trigger.isDelete) ||
+        } else if ((Trigger.isExecuting && Trigger.isBefore && Trigger.isDelete) ||
             (ctx != null && ctx == 'before delete')) {
             this.context = TriggerContext.BEFORE_DELETE;
-        } else if((Trigger.isExecuting && Trigger.isAfter && Trigger.isInsert) ||
+        } else if ((Trigger.isExecuting && Trigger.isAfter && Trigger.isInsert) ||
             (ctx != null && ctx == 'after insert')) {
             this.context = TriggerContext.AFTER_INSERT;
-        } else if((Trigger.isExecuting && Trigger.isAfter && Trigger.isUpdate) ||
+        } else if ((Trigger.isExecuting && Trigger.isAfter && Trigger.isUpdate) ||
             (ctx != null && ctx == 'after update')) {
             this.context = TriggerContext.AFTER_UPDATE;
-        } else if((Trigger.isExecuting && Trigger.isAfter && Trigger.isDelete) ||
+        } else if ((Trigger.isExecuting && Trigger.isAfter && Trigger.isDelete) ||
             (ctx != null && ctx == 'after delete')) {
             this.context = TriggerContext.AFTER_DELETE;
-        } else if((Trigger.isExecuting && Trigger.isAfter && Trigger.isUndelete) ||
+        } else if ((Trigger.isExecuting && Trigger.isAfter && Trigger.isUndelete) ||
             (ctx != null && ctx == 'after undelete')) {
             this.context = TriggerContext.AFTER_UNDELETE;
         }
@@ -176,9 +183,9 @@ public virtual class TriggerHandler {
     @TestVisible
     private void addToLoopCount () {
         String handlerName = getHandlerName();
-        if(TriggerHandler.loopCountMap.containsKey(handlerName)) {
+        if (TriggerHandler.loopCountMap.containsKey(handlerName)) {
             Boolean exceeded = TriggerHandler.loopCountMap.get(handlerName).increment();
-            if(exceeded) {
+            if (exceeded) {
                 Integer max = TriggerHandler.loopCountMap.get(handlerName).max;
                 throw new TriggerHandlerException('Maximum loop count of ' + String.valueOf(max) + ' reached in ' + handlerName);
             }
@@ -202,7 +209,7 @@ public virtual class TriggerHandler {
 
     @TestVisible
     private String getHandlerName () {
-        return String.valueOf(this).substring(0,String.valueOf(this).indexOf(':'));
+        return String.valueOf(this).substring(0, String.valueOf(this).indexOf(':'));
     }
 
     /***************************************
