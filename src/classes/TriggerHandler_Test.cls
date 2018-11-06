@@ -160,8 +160,15 @@ private class TriggerHandler_Test {
         handler.run();
         handler.run();
 
+        Integer loopCount = TriggerHandler.getLoopCount('TestHandler');
+        System.assertEquals(2, loopCount, 'the framework should have recorded the loop count for the handler');
+
+        loopCount = TriggerHandler.getLoopCount('AnotherHandler');
+        System.assertEquals(0, loopCount, 'the framework should return 0 since the specified handler wasn\'t fired');
+
         // clear the tests
         resetTest();
+
 
         try {
             // try running it. This should exceed the limit.
