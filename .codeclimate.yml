@@ -1,0 +1,6 @@
+version: 2
+plugins:
+  pmd:
+    enabled: true
+    config:
+      file: pmd.xml
