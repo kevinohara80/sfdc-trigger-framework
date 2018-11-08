@@ -1,7 +1,7 @@
 version: 2
 checks:
-  - identitcal-code:
-      config:
+  identitcal-code:
+    config:
 plugins:
   pmd:
     enabled: true
