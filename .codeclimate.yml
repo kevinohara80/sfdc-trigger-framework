@@ -1,6 +1,5 @@
 version: 2
 checks:
-  checks:
   argument-count:
     enabled: true
   complex-logic:
