@@ -87,9 +87,7 @@ public virtual class TriggerHandler {
     }
 
     public static void bypass (List<String> handlersNames) {
-        for (String handlerName : handlersNames) {
-            bypass(handlerName);
-        }
+        bypassedHandlers.addAll(handlersNames);
     }
 
     public static void bypass (Type handlerType) {
@@ -109,9 +107,7 @@ public virtual class TriggerHandler {
     }
 
     public static void clearBypass (List<String> handlersNames) {
-        for (String handlerName : handlersNames) {
-            clearBypass(handlerName);
-        }
+        bypassedHandlers.removeAll(handlersNames);
     }
 
     public static void clearGlobalBypass () {
