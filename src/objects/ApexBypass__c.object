@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>List</customSettingsType>
+    <enableFeeds>false</enableFeeds>
+    <fields>
+        <fullName>Description__c</fullName>
+        <externalId>false</externalId>
+        <label>Description</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>TextArea</type>
+    </fields>
+    <fields>
+        <fullName>EntityID__c</fullName>
+        <externalId>false</externalId>
+        <label>User or Profile ID</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>isBypassed__c</fullName>
+        <defaultValue>false</defaultValue>
+        <externalId>false</externalId>
+        <label>isBypassed</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <label>Apex Bypass Configuration</label>
+    <visibility>Public</visibility>
+</CustomObject>
