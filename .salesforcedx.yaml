@@ -1,0 +1,4 @@
+scratch-org-def: config/project-scratch-def.json
+  run-apex-tests: true
+  delete-scratch-org: false
+  show-scratch-org-url: true  
