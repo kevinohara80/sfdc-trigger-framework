@@ -3,6 +3,8 @@ public virtual class TriggerHandler {
   // static map of handlername, times run() was invoked
   private static Map<String, LoopCount> loopCountMap;
   private static Set<String> bypassedHandlers;
+  @TestVisible private static Boolean globalBypass;
+  @TestVisible private static Boolean showLimits;
 
   // the current context of the trigger, overridable in tests
   @TestVisible
@@ -16,8 +18,10 @@ public virtual class TriggerHandler {
   static {
     loopCountMap = new Map<String, LoopCount>();
     bypassedHandlers = new Set<String>();
+    globalBypass = false;
+    showLimits = false;
   }
-  
+
   // constructor
   public TriggerHandler() {
     this.setTriggerContext();
@@ -51,6 +55,14 @@ public virtual class TriggerHandler {
       this.afterUndelete();
     }
 
+    if(showLimits) {
+      System.debug(LoggingLevel.DEBUG, String.format('{0} on {1} ({2}/{3})', new List<String>{
+        this.context+'',
+        getHandlerName(),
+        Limits.getQueries()+'',
+        Limits.getLimitQueries()+''
+      }));
+    }
   }
 
   public void setMaxLoopCount(Integer max) {
@@ -71,19 +83,58 @@ public virtual class TriggerHandler {
    ***************************************/
 
   public static void bypass(String handlerName) {
-    TriggerHandler.bypassedHandlers.add(handlerName);
+    bypassedHandlers.add(handlerName);
+  }
+
+  public static void bypass(List<String> handlersNames) {
+    bypassedHandlers.addAll(handlersNames);
+  }
+
+  public static void bypass(Type handlerType) {
+    bypass(handlerType.getName());
+  }
+
+  public static void bypassAll() {
+    globalBypass = true;
   }
 
   public static void clearBypass(String handlerName) {
-    TriggerHandler.bypassedHandlers.remove(handlerName);
+    bypassedHandlers.remove(handlerName);
+  }
+
+  public static void clearBypass(Type handlerType) {
+    clearBypass(handlerType.getName());
+  }
+
+  public static void clearBypass(List<String> handlersNames) {
+    bypassedHandlers.removeAll(handlersNames);
+  }
+
+  public static void clearGlobalBypass() {
+    globalBypass = false;
   }
 
   public static Boolean isBypassed(String handlerName) {
-    return TriggerHandler.bypassedHandlers.contains(handlerName);
+    return bypassedHandlers.contains(handlerName);
+  }
+
+  public static Boolean isBypassed(Type handlerType) {
+    return bypassedHandlers.contains(handlerType.getName());
   }
 
   public static void clearAllBypasses() {
-    TriggerHandler.bypassedHandlers.clear();
+    bypassedHandlers.clear();
+  }
+
+  public static void showLimits() {
+    showLimits = true;
+  }
+
+  public static Integer getLoopCount(String handlerName) {
+    if(TriggerHandler.loopCountMap.containsKey(handlerName)) {
+      return TriggerHandler.loopCountMap.get(handlerName).getCount();
+    }
+    return 0;
   }
 
   /***************************************
@@ -103,7 +154,7 @@ public virtual class TriggerHandler {
     } else {
       this.isTriggerExecuting = true;
     }
-    
+
     if((Trigger.isExecuting && Trigger.isBefore && Trigger.isInsert) ||
         (ctx != null && ctx == 'before insert')) {
       this.context = TriggerContext.BEFORE_INSERT;
@@ -147,7 +198,7 @@ public virtual class TriggerHandler {
     if(!this.isTriggerExecuting || this.context == null) {
       throw new TriggerHandlerException('Trigger handler called outside of Trigger execution');
     }
-    if(TriggerHandler.bypassedHandlers.contains(getHandlerName())) {
+    if(globalBypass || TriggerHandler.bypassedHandlers.contains(getHandlerName())) {
       return false;
     }
     return true;
