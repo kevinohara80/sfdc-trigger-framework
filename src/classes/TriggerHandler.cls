@@ -84,19 +84,24 @@ public virtual class TriggerHandler {
    * public static methods
    ***************************************/
 
+  // bypass by string, e.g. TriggerHandler.bypass('AccountTriggerHandler')
   public static void bypass(String handlerName) {
     TriggerHandler.bypassedHandlers.add(handlerName);
   }
 
+  // bypass by list, e.g. TriggerHandler.bypass(listOfHandlerStrings)
   public static void bypass(List<String> handlersNames) {
     TriggerHandler.bypassedHandlers.addAll(handlersNames);
   }
 
+  // bypass by type, e.g. TriggerHandler.bypass(AccountTriggerHandler.class)
   public static void bypass(Type handlerType) {
     TriggerHandler.bypass(handlerType.getName());
   }
 
+  // bypass all handlers (clear bypassedHandlers to prevent confusion)
   public static void bypassAll() {
+    TriggerHandler.bypassedHandlers.clear();
     globalBypass = true;
   }
 
@@ -104,20 +109,33 @@ public virtual class TriggerHandler {
     TriggerHandler.bypassedHandlers.remove(handlerName);
   }
 
-  public static void clearBypass(Type handlerType) {
-    TriggerHandler.clearBypass(handlerType.getName());
-  }
-
   public static void clearBypass(List<String> handlersNames) {
     TriggerHandler.bypassedHandlers.removeAll(handlersNames);
   }
 
+  public static void clearBypass(Type handlerType) {
+    TriggerHandler.clearBypass(handlerType.getName());
+  }
+
+  // a handler is considered bypassed if it was bypassed, or all handlers have been
   public static Boolean isBypassed(String handlerName) {
     return (globalBypass || TriggerHandler.bypassedHandlers.contains(handlerName));
   }
 
   public static Boolean isBypassed(Type handlerType) {
     return (globalBypass || TriggerHandler.bypassedHandlers.contains(handlerType.getName()));
+  }
+
+  // return a list of the bypassed handlers
+  public static List<String> bypassList() {
+    List<String> bypasses = new List<String>(TriggerHandler.bypassedHandlers);
+
+    // bypassAll clears bypassedHandlers, so bypasses is empty here
+    if(globalBypass) {
+      bypasses.add('bypassAll');
+    }
+
+    return bypasses;
   }
 
   public static void clearAllBypasses() {
@@ -199,10 +217,7 @@ public virtual class TriggerHandler {
     if(!this.isTriggerExecuting || this.context == null) {
       throw new TriggerHandlerException('Trigger handler called outside of Trigger execution');
     }
-    if(globalBypass || TriggerHandler.bypassedHandlers.contains(getHandlerName())) {
-      return false;
-    }
-    return true;
+    return (!globalBypass && !TriggerHandler.bypassedHandlers.contains(getHandlerName())) {
   }
 
   @TestVisible
@@ -240,6 +255,7 @@ public virtual class TriggerHandler {
     private Integer max;
     private Integer count;
 
+    // constructor
     public LoopCount() {
       this.max = 5;
       this.count = 0;
