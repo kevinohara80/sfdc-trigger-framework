@@ -22,7 +22,10 @@ public virtual class TriggerHandler {
   public TriggerHandler() {
     this.setTriggerContext();
   }
-
+  public TriggerHandler(String handlerName) {
+    this.handlerName = handlerName;
+    this.setTriggerContext();
+  }
   /***************************************
    * public instance methods
    ***************************************/
@@ -161,8 +164,12 @@ public virtual class TriggerHandler {
 
   @TestVisible
   private String getHandlerName() {
-    return String.valueOf(this).substring(0,String.valueOf(this).indexOf(':'));
+    if(String.isBlank(this.handlerName)) {
+      this.handlerName = String.valueOf(this).substring(0,String.valueOf(this).indexOf(':'));
+    }
+    return handlerName;
   }
+  private String handlerName {get; set;}
 
   /***************************************
    * context methods
