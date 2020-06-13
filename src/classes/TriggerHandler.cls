@@ -150,6 +150,10 @@ public virtual class TriggerHandler {
     showLimits = true;
   }
 
+  public static void showLimits(Boolean enabled) {
+    showLimits = enabled;
+  }
+
   public static Integer getLoopCount(String handlerName) {
     if(TriggerHandler.loopCountMap.containsKey(handlerName)) {
       return TriggerHandler.loopCountMap.get(handlerName).getCount();
