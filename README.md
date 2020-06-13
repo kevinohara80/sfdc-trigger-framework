@@ -107,7 +107,7 @@ TriggerHandler.bypass('AccountTriggerHandler');
 //List<String> handlers = new List<String>{'AccountTriggerHandler', 'OpportunityTriggerHandler'}
 //TriggerHandler.bypass(handlers);
 // globally
-//TriggerHandler.globalBypass()
+//TriggerHandler.bypassAll()
 
 acc.Name = 'No Trigger';
 update acc; // won't invoke the AccountTriggerHandler
