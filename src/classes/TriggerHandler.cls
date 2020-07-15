@@ -41,20 +41,28 @@ public virtual class TriggerHandler {
     addToLoopCount();
 
     // dispatch to the correct handler method
-    if(this.context == TriggerContext.BEFORE_INSERT) {
-      this.beforeInsert();
-    } else if(this.context == TriggerContext.BEFORE_UPDATE) {
-      this.beforeUpdate();
-    } else if(this.context == TriggerContext.BEFORE_DELETE) {
-      this.beforeDelete();
-    } else if(this.context == TriggerContext.AFTER_INSERT) {
-      this.afterInsert();
-    } else if(this.context == TriggerContext.AFTER_UPDATE) {
-      this.afterUpdate();
-    } else if(this.context == TriggerContext.AFTER_DELETE) {
-      this.afterDelete();
-    } else if(this.context == TriggerContext.AFTER_UNDELETE) {
-      this.afterUndelete();
+    switch on this.context {
+      when BEFORE_INSERT {
+        this.beforeInsert();
+      }
+      when BEFORE_UPDATE {
+        this.beforeUpdate();
+      }
+      when BEFORE_DELETE {
+        this.beforeDelete();
+      }
+      when AFTER_INSERT {
+        this.afterInsert();
+      }
+      when AFTER_UPDATE {
+        this.afterUpdate();
+      }
+      when AFTER_DELETE {
+        this.afterDelete();
+      }
+      when AFTER_UNDELETE {
+        this.afterUndelete();
+      }
     }
 
     if(showLimits) {
@@ -221,7 +229,7 @@ public virtual class TriggerHandler {
     if(!this.isTriggerExecuting || this.context == null) {
       throw new TriggerHandlerException('Trigger handler called outside of Trigger execution');
     }
-    return (!globalBypass && !TriggerHandler.bypassedHandlers.contains(getHandlerName())) {
+    return (!globalBypass && !TriggerHandler.bypassedHandlers.contains(getHandlerName()));
   }
 
   @TestVisible
@@ -276,11 +284,7 @@ public virtual class TriggerHandler {
     }
 
     public Boolean exceeded() {
-      if(this.max < 0) return false;
-      if(this.count > this.max) {
-        return true;
-      }
-      return false;
+      return this.max >= 0 && this.count > this.max;
     }
 
     public Integer getMax() {
