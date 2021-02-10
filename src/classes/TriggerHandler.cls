@@ -3,6 +3,8 @@ public virtual class TriggerHandler {
   // static map of handlername, times run() was invoked
   private static Map<String, LoopCount> loopCountMap;
   private static Set<String> bypassedHandlers;
+  @TestVisible private static Boolean globalBypass;
+  @TestVisible private static Boolean showLimits;
 
   // the current context of the trigger, overridable in tests
   @TestVisible
@@ -16,8 +18,10 @@ public virtual class TriggerHandler {
   static {
     loopCountMap = new Map<String, LoopCount>();
     bypassedHandlers = new Set<String>();
+    globalBypass = false;
+    showLimits = false;
   }
-  
+
   // constructor
   public TriggerHandler() {
     this.setTriggerContext();
@@ -60,6 +64,15 @@ public virtual class TriggerHandler {
         this.afterUndelete();
       }
     }
+
+    if(showLimits) {
+      System.debug(LoggingLevel.DEBUG, String.format('{0} on {1} ({2}/{3})', new List<String>{
+        this.context+'',
+        getHandlerName(),
+        Limits.getQueries()+'',
+        Limits.getLimitQueries()+''
+      }));
+    }
   }
 
   public void setMaxLoopCount(Integer max) {
@@ -79,20 +92,81 @@ public virtual class TriggerHandler {
    * public static methods
    ***************************************/
 
+  // bypass by string, e.g. TriggerHandler.bypass('AccountTriggerHandler')
   public static void bypass(String handlerName) {
     TriggerHandler.bypassedHandlers.add(handlerName);
+  }
+
+  // bypass by list, e.g. TriggerHandler.bypass(listOfHandlerStrings)
+  public static void bypass(List<String> handlersNames) {
+    TriggerHandler.bypassedHandlers.addAll(handlersNames);
+  }
+
+  // bypass by type, e.g. TriggerHandler.bypass(AccountTriggerHandler.class)
+  public static void bypass(Type handlerType) {
+    TriggerHandler.bypass(handlerType.getName());
+  }
+
+  // bypass all handlers (clear bypassedHandlers to prevent confusion)
+  public static void bypassAll() {
+    TriggerHandler.bypassedHandlers.clear();
+    globalBypass = true;
   }
 
   public static void clearBypass(String handlerName) {
     TriggerHandler.bypassedHandlers.remove(handlerName);
   }
 
+  public static void clearBypass(List<String> handlersNames) {
+    TriggerHandler.bypassedHandlers.removeAll(handlersNames);
+  }
+
+  public static void clearBypass(Type handlerType) {
+    TriggerHandler.clearBypass(handlerType.getName());
+  }
+
+  // a handler is considered bypassed if it was bypassed, or all handlers have been
   public static Boolean isBypassed(String handlerName) {
-    return TriggerHandler.bypassedHandlers.contains(handlerName);
+    return (globalBypass || TriggerHandler.bypassedHandlers.contains(handlerName));
+  }
+
+  public static Boolean isBypassed(Type handlerType) {
+    return (globalBypass || TriggerHandler.bypassedHandlers.contains(handlerType.getName()));
+  }
+
+  // return a list of the bypassed handlers
+  public static List<String> bypassList() {
+    List<String> bypasses = new List<String>(TriggerHandler.bypassedHandlers);
+
+    // bypassAll clears bypassedHandlers, so bypasses is empty here
+    if(globalBypass) {
+      bypasses.add('bypassAll');
+    }
+
+    return bypasses;
   }
 
   public static void clearAllBypasses() {
-    TriggerHandler.bypassedHandlers.clear();
+    if(globalBypass) {
+      globalBypass = false;
+    } else {
+      TriggerHandler.bypassedHandlers.clear();
+    }
+  }
+
+  public static void showLimits() {
+    showLimits = true;
+  }
+
+  public static void showLimits(Boolean enabled) {
+    showLimits = enabled;
+  }
+
+  public static Integer getLoopCount(String handlerName) {
+    if(TriggerHandler.loopCountMap.containsKey(handlerName)) {
+      return TriggerHandler.loopCountMap.get(handlerName).getCount();
+    }
+    return 0;
   }
 
   /***************************************
@@ -112,28 +186,27 @@ public virtual class TriggerHandler {
     } else {
       this.isTriggerExecuting = true;
     }
-    
-    if((Trigger.isExecuting && Trigger.isBefore && Trigger.isInsert) ||
-        (ctx != null && ctx == 'before insert')) {
-      this.context = TriggerContext.BEFORE_INSERT;
-    } else if((Trigger.isExecuting && Trigger.isBefore && Trigger.isUpdate) ||
-        (ctx != null && ctx == 'before update')){
-      this.context = TriggerContext.BEFORE_UPDATE;
-    } else if((Trigger.isExecuting && Trigger.isBefore && Trigger.isDelete) ||
-        (ctx != null && ctx == 'before delete')) {
-      this.context = TriggerContext.BEFORE_DELETE;
-    } else if((Trigger.isExecuting && Trigger.isAfter && Trigger.isInsert) ||
-        (ctx != null && ctx == 'after insert')) {
-      this.context = TriggerContext.AFTER_INSERT;
-    } else if((Trigger.isExecuting && Trigger.isAfter && Trigger.isUpdate) ||
-        (ctx != null && ctx == 'after update')) {
-      this.context = TriggerContext.AFTER_UPDATE;
-    } else if((Trigger.isExecuting && Trigger.isAfter && Trigger.isDelete) ||
-        (ctx != null && ctx == 'after delete')) {
-      this.context = TriggerContext.AFTER_DELETE;
-    } else if((Trigger.isExecuting && Trigger.isAfter && Trigger.isUndelete) ||
-        (ctx != null && ctx == 'after undelete')) {
-      this.context = TriggerContext.AFTER_UNDELETE;
+
+    if(Trigger.isExecuting) {
+      if(Trigger.isBefore) {
+        if (Trigger.IsInsert || (ctx != null && ctx == 'before insert')) {
+          this.context = TriggerContext.BEFORE_INSERT;
+        } else if (Trigger.IsUpdate || (ctx != null && ctx == 'before update')) {
+          this.context = TriggerContext.BEFORE_UPDATE;
+        } else if (Trigger.IsDelete || (ctx != null && ctx == 'before delete')) {
+          this.context = TriggerContext.BEFORE_DELETE;
+        }
+      } else if(Trigger.isAfter) {
+        if (Trigger.IsInsert || (ctx != null && ctx == 'after insert')) {
+          this.context = TriggerContext.AFTER_INSERT;
+        } else if (Trigger.IsUpdate || (ctx != null && ctx == 'after  update')) {
+          this.context = TriggerContext.AFTER_UPDATE;
+        } else if (Trigger.IsDelete || (ctx != null && ctx == 'after delete')) {
+          this.context = TriggerContext.AFTER_DELETE;
+        } else if (Trigger.IsUndelete || (ctx != null && ctx == 'after undelete')) {
+          this.context = TriggerContext.AFTER_UNDELETE;
+        }
+      }
     }
   }
 
@@ -156,7 +229,7 @@ public virtual class TriggerHandler {
     if(!this.isTriggerExecuting || this.context == null) {
       throw new TriggerHandlerException('Trigger handler called outside of Trigger execution');
     }
-    return !TriggerHandler.bypassedHandlers.contains(getHandlerName());
+    return (!globalBypass && !TriggerHandler.bypassedHandlers.contains(getHandlerName()));
   }
 
   @TestVisible
@@ -194,6 +267,7 @@ public virtual class TriggerHandler {
     private Integer max;
     private Integer count;
 
+    // constructor
     public LoopCount() {
       this.max = 5;
       this.count = 0;
