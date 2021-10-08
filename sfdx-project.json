@@ -5,6 +5,7 @@
       "default": true
     }
   ],
+  "name": "Trigger Framework",
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
   "sourceApiVersion": "52.0"
