@@ -13,13 +13,13 @@ This trigger framework bundles a single **TriggerHandler** base class that you c
 
 The base class also provides a secondary role as a supervisor for Trigger execution. It acts like a watchdog, monitoring trigger activity and providing an api for controlling certain aspects of execution and control flow.
 
-But the most important part of this framework is that it's minimal and simple to use. 
+But the most important part of this framework is that it's minimal and simple to use.
 
 **Deploy to SFDX Scratch Org:**
-[![Deploy](https://deploy-to-sfdx.com/dist/assets/images/DeployToSFDX.svg)](https://deploy-to-sfdx.com)
+[Deploy instructions](./DEPLOY.md)
 
 **Deploy to Salesforce Org:**
-[![Deploy](https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png)](https://githubsfdeploy.herokuapp.com/?owner=kevinohara80&repo=sfdc-trigger-framework&ref=master)
+[![Deploy](https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png)](https://githubsfdeploy.herokuapp.com/?owner=kevinohara80&repo=sfdc-trigger-framework)
 
 ## Usage
 
@@ -33,7 +33,12 @@ In your trigger handler, to add logic to any of the trigger contexts, you only n
 
 ```java
 public class OpportunityTriggerHandler extends TriggerHandler {
-  
+
+	/* Optional Constructor - better performance */
+  public OpportunityTriggerHandler(){
+    super('OpportunityTriggerHandler');
+  }
+
   public override void beforeUpdate() {
     for(Opportunity o : (List<Opportunity>) Trigger.new) {
       // do something
@@ -45,17 +50,22 @@ public class OpportunityTriggerHandler extends TriggerHandler {
 }
 ```
 
-**Note:** When referencing the Trigger statics within a class, SObjects are returned versus SObject subclasses like Opportunity, Account, etc. This means that you must cast when you reference them in your trigger handler. You could do this in your constructor if you wanted. 
+**Note:** When referencing the Trigger statics within a class, SObjects are returned versus SObject subclasses like Opportunity, Account, etc. This means that you must cast when you reference them in your trigger handler. You could do this in your constructor if you wanted.
 
 ```java
 public class OpportunityTriggerHandler extends TriggerHandler {
+
+  /* Optional Constructor - better performance */
+  public OpportunityTriggerHandler(){
+    super('OpportunityTriggerHandler');
+  }
 
   private Map<Id, Opportunity> newOppMap;
 
   public OpportunityTriggerHandler() {
     this.newOppMap = (Map<Id, Opportunity>) Trigger.newMap;
   }
-  
+
   public override void afterUpdate() {
     //
   }
@@ -80,10 +90,15 @@ To prevent recursion, you can set a max loop count for Trigger Handler. If this 
 ```java
 public class OpportunityTriggerHandler extends TriggerHandler {
 
+	/* Optional Constructor - better performance */
+  public OpportunityTriggerHandler(){
+    super('OpportunityTriggerHandler');
+  }
+
   public OpportunityTriggerHandler() {
     this.setMaxLoopCount(1);
   }
-  
+
   public override void afterUpdate() {
     List<Opportunity> opps = [SELECT Id FROM Opportunity WHERE Id IN :Trigger.newMap.keySet()];
     update opps; // this will throw after this update
@@ -98,10 +113,15 @@ What if you want to tell other trigger handlers to halt execution? That's easy w
 
 ```java
 public class OpportunityTriggerHandler extends TriggerHandler {
-  
+
+	/* Optional Constructor - better performance */
+  public OpportunityTriggerHandler(){
+    super('OpportunityTriggerHandler');
+  }
+
   public override void afterUpdate() {
     List<Opportunity> opps = [SELECT Id, AccountId FROM Opportunity WHERE Id IN :Trigger.newMap.keySet()];
-    
+
     Account acc = [SELECT Id, Name FROM Account WHERE Id = :opps.get(0).AccountId];
 
     TriggerHandler.bypass('AccountTriggerHandler');
