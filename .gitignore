@@ -40,5 +40,8 @@ $RECYCLE.BIN/
 # Local environment variables
 .env
 
+# temp folder (if present)
+temp
+
 # Org Metadata
 
