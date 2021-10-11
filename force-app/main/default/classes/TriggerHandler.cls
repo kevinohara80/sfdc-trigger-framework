@@ -170,38 +170,6 @@ public virtual class TriggerHandler {
     this.setTriggerContext(Trigger.operationType, false);
   }
 
-
-/*
-  @TestVisible
-  private void setTriggerContext(String ctxString, Boolean testMode){
-    switch on ctxString {
-      when 'before insert'{
-        setTriggerContext(System.TriggerOperation.BEFORE_INSERT, testMode);
-      }
-      when 'before update'{
-        setTriggerContext(System.TriggerOperation.BEFORE_UPDATE, testMode);
-      }
-      when 'before delete'{
-        setTriggerContext(System.TriggerOperation.BEFORE_DELETE, testMode);
-      }
-      when 'after insert'{
-        setTriggerContext(System.TriggerOperation.AFTER_INSERT, testMode);
-      }
-      when 'after update'{
-        setTriggerContext(System.TriggerOperation.AFTER_UPDATE, testMode);
-      }
-      when 'after delete'{
-        setTriggerContext(System.TriggerOperation.AFTER_DELETE, testMode);
-      }
-      when 'after undelete'{
-        setTriggerContext(System.TriggerOperation.AFTER_UNDELETE, testMode);
-      }
-      when else {
-        setTriggerContext(Trigger.OperationType, testMode);
-      }
-    }
-  } */
-
   @TestVisible
   private void setTriggerContext(System.TriggerOperation opType, Boolean testMode) {
 
