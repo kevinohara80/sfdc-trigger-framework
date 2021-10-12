@@ -27,6 +27,11 @@ public virtual class TriggerHandler {
     this.setTriggerContext();
   }
 
+  public TriggerHandler(String handlerName) {
+    this.handlerName = handlerName;
+    this.setTriggerContext();
+  }
+
 
   /***************************************
   * public instance methods
