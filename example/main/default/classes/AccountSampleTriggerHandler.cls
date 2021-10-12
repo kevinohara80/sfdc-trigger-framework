@@ -1,4 +1,4 @@
-public with sharing class AccountSampleTriggerHandler extends TriggerHandler {
+public without sharing class AccountSampleTriggerHandler extends TriggerHandler {
 
 	private List<Account> newRecords;
 	private List<Account> oldRecords;
