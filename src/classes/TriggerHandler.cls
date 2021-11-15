@@ -162,13 +162,13 @@ public virtual class TriggerHandler {
     return !TriggerHandler.bypassedHandlers.contains(getHandlerName());
   }
 
-	@TestVisible
-	private String getHandlerName() {
+  @TestVisible
+  private String getHandlerName() {
     if(tempHandlerName == null) {
         tempHandlerName = String.valueOf(this).substring(0, String.valueOf(this).indexOf(':'));
     }
-		return tempHandlerName;
-	}
+    return tempHandlerName;
+  }
 
   /***************************************
    * context methods
