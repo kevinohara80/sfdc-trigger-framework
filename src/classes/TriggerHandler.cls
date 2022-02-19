@@ -11,6 +11,9 @@ public virtual class TriggerHandler {
   // the current context of the trigger, overridable in tests
   @TestVisible
   private Boolean isTriggerExecuting;
+  
+  // cache for handler name
+  private String tempHandlerName;
 
   // static initialization
   static {
@@ -161,7 +164,10 @@ public virtual class TriggerHandler {
 
   @TestVisible
   private String getHandlerName() {
-    return String.valueOf(this).substring(0,String.valueOf(this).indexOf(':'));
+    if(tempHandlerName == null) {
+        tempHandlerName = String.valueOf(this).substring(0, String.valueOf(this).indexOf(':'));
+    }
+    return tempHandlerName;
   }
 
   /***************************************
